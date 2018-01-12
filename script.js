@@ -19,7 +19,8 @@ $(document).ready(initializeApp);
  *  { name: 'Jill', course: 'Comp Sci', grade: 85 }
  * ];
  */
-studentArray = [];
+var studentArray = [];
+var globalResult;
 
 
 /***************************************************************************************************
@@ -43,11 +44,36 @@ function initializeApp() {
 function addClickHandlersToElements() {
   $('.btn-success').on('click', handleAddClicked);
   $('.btn-default').on('click', handleCancelClick);
+  $('.btn-info').on('click', getDataFromServer);
 
 
 
 }
+/***************************************************************************************************
+ *get the data from the api server
+ */
 
+function getDataFromServer() {
+  $.ajax({
+    url: "http://s-apis.learningfuze.com/sgt/get",
+    method: 'post',
+    data: {
+      api_key: 'd2dcw7I6wO'
+    },
+    dataType: 'JSON',
+    success: function(response) {
+      console.log("the operation succeeded");
+      console.log(response);
+      //updateStudentList(data.data);
+      var dataObj = response;
+      studentArray = dataObj.data;
+      updateStudentList(studentArray);
+    }
+    // error: function(err) {
+    //   console.log('error:' + err)
+    // }
+  })
+}
 /***************************************************************************************************
  * handleAddClicked - Event Handler when user clicks the add button
  * @param {object} event  The event object from the click
@@ -112,7 +138,6 @@ function renderStudentOnDom(student) {
   newTr.appendTo($('thead'));
   newTr.append(newTd1, newTd2, newTd3, newTd4.append(operations));
   operations.on('click', function() {
-    var clicked = $(this);
     removeStudent(student);
   })
 }
@@ -158,8 +183,11 @@ function renderGradeAverage(number) {
 function removeStudent(student) {
   //remoevs students from array
   var studentIndex = studentArray.indexOf(student);
-  student.displayRow.remove();
   studentArray.splice(studentIndex, 1);
-  updateStudentList(studentArray);
+  student.displayRow.remove();
+  var average = calculateGradeAverage(studentArray);
+  renderGradeAverage(average);
+
+  //  updateStudentList(studentArray);
 
 }
