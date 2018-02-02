@@ -31,6 +31,7 @@ var globalResult;
  */
 function initializeApp() {
   addClickHandlersToElements();
+  getDataFromServer();
 
 
 }
@@ -48,6 +49,46 @@ function addClickHandlersToElements() {
 
 
 
+}
+/***************************************************************************************************
+ *send the data to the api server
+ */
+function sendDataToServer(students) {
+  $.ajax({
+    url: "http://s-apis.learningfuze.com/sgt/create",
+    method: 'post',
+    data: {
+      api_key: 'd2dcw7I6wO',
+      name: students.name,
+      grade: students.grade,
+      course: students.course
+    },
+    dataTypes: 'JSON',
+    success: function(response) {
+      console.log('the sending was successful' + response);
+      var sendData = JSON.parse(response);
+      studentArray[studentArray.length - 1].id = sendData.new_id;
+      console.log(studentArray[studentArray.length - 1]);
+
+    }
+  })
+}
+/***************************************************************************************************
+ *delete student request
+ */
+function requestDeleteServer(student) {
+  $.ajax({
+    url: "http://s-apis.learningfuze.com/sgt/delete",
+    method: 'post',
+    data: {
+      api_key: 'd2dcw7I6wO',
+      student_id: student.id
+    },
+    dataType: 'JSON',
+    success: function() {
+      console.log('deleted stuff');
+    }
+  })
 }
 /***************************************************************************************************
  *get the data from the api server
@@ -108,6 +149,7 @@ function addStudent() {
   studentObj.course = stuCourse.val();
   studentObj.grade = stuGrade.val();
   studentArray.push(studentObj);
+  sendDataToServer(studentObj);
   updateStudentList(studentArray);
   clearAddStudentFormInputs();
 }
@@ -182,6 +224,7 @@ function renderGradeAverage(number) {
  */
 function removeStudent(student) {
   //remoevs students from array
+  requestDeleteServer(student);
   var studentIndex = studentArray.indexOf(student);
   studentArray.splice(studentIndex, 1);
   student.displayRow.remove();
