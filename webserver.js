@@ -15,7 +15,6 @@ ws.get('/users', (req, res) => {
         db.query('SELECT * FROM students', function(error, rows, fields) {
             console.log("this also hit");
             console.log(error);
-
             const output = {
                 success: true,
                 data: rows
